@@ -1,4 +1,3 @@
-version: "3"
 services:
   network_info:
     entrypoint: /app/create_db.py

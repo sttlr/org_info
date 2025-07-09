@@ -10,4 +10,11 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 cd $DIR/../
 
-docker compose run --rm -e PGPASSWORD=network_info --entrypoint=psql db -h db -U network_info -t -q -P pager=off -c "SELECT block.inetnum FROM block WHERE block.netname ILIKE '%$1%' OR block.description ILIKE '%$1%';" network_info | grep -v '\[+\] Building' | sed 's/^ //'
+case $ORG_INFO_OUTPUT_MODE in
+  'short')
+    docker compose run --rm -e PGPASSWORD=network_info --entrypoint=psql db -h db -U network_info -t -q -P pager=off -c "SELECT block.inetnum FROM block WHERE block.netname ILIKE '%$1%' OR block.description ILIKE '%$1%';" network_info | grep -v '\[+\] Building' | sed 's/^ //'
+    ;;
+  * | 'full')
+    docker compose run --rm -e PGPASSWORD=network_info --entrypoint=psql db -h db -U network_info -t -q -P pager=off -c "SELECT block.inetnum, block.netname, block.description FROM block WHERE block.netname ILIKE '%$1%' OR block.description ILIKE '%$1%';" network_info | grep -v '\[+\] Building' | sed 's/^ //'
+    ;;
+esac
